@@ -37,15 +37,12 @@ export default function Dashboard() {
 
       if (response.ok) {
         const data = await response.json()
-        console.log('📊 Dados da API recebidos:', data)
         setStatsData(data)
         setLastUpdate(new Date())
       } else {
-        console.log('API Response:', response.status, response.statusText)
         setStatsData(null)
       }
     } catch (error) {
-      console.error('Erro ao buscar dados:', error)
       setStatsData(null)
     }
   }
@@ -64,14 +61,11 @@ export default function Dashboard() {
 
       if (response.ok) {
         const data = await response.json()
-        console.log('📅 Dados mensais da API:', data)
         setStatsMes(data)
       } else {
-        console.log('API Monthly Response:', response.status, response.statusText)
         setStatsMes(null)
       }
     } catch (error) {
-      console.error('Erro ao buscar dados mensais:', error)
       setStatsMes(null)
     }
   }

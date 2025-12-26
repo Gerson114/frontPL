@@ -23,14 +23,11 @@ export default function Relatorios() {
 
       if (response.ok) {
         const data = await response.json()
-        console.log('📊 Stats Mês da API:', data)
         setStatsMes(data)
       } else {
-        console.log('API Response:', response.status, response.statusText)
         setStatsMes(null)
       }
     } catch (error) {
-      console.error('Erro:', error)
       setStatsMes(null)
     } finally {
       setLoading(false)
