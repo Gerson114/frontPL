@@ -1,5 +1,7 @@
+import { getApiUrl } from '../utils/security'
+
 class ApiService {
-  private baseURL = 'http://192.168.120.249:8080'
+  private baseURL = getApiUrl()
   
   private getHeaders() {
     const token = localStorage.getItem('token')

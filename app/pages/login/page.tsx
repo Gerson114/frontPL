@@ -1,55 +1,66 @@
 "use client"
 import { useState } from "react"
+import { sanitizeInput, validateEmail, validatePassword, getLoginEndpoint } from "../../utils/security"
 
 export default function Login() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [carregando, setCarregando] = useState(false)
+    const [error, setError] = useState('')
 
     async function handleLogin(event: React.FormEvent) {
         event.preventDefault()
+        setError('')
+        
+        const sanitizedEmail = sanitizeInput(email)
+        const sanitizedPassword = sanitizeInput(password)
+        
+        if (!validateEmail(sanitizedEmail)) {
+            setError('Email inválido')
+            return
+        }
+        
+        if (!validatePassword(sanitizedPassword)) {
+            setError('Senha deve ter pelo menos 6 caracteres')
+            return
+        }
+        
         setCarregando(true)
         
         try {
-            const response = await fetch('http://192.168.120.249:8080/login', {
+            const response = await fetch(getLoginEndpoint(), {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email, password })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: sanitizedEmail, password: sanitizedPassword })
             })
 
-            if (!response.ok) {
-                throw new Error('Erro ao fazer login')
-            }
-
-            const data = await response.json()
-            
-            if (data.token) {
+            if (response.ok) {
+                const data = await response.json()
                 localStorage.setItem('token', data.token)
                 window.location.href = '/dashboard'
+            } else {
+                setError('Credenciais inválidas')
             }
-            
         } catch (error) {
-            alert('Erro ao fazer login. Verifique suas credenciais.')
+            setError('Erro de conexão')
         } finally {
             setCarregando(false)
         }
     }
 
     return (
-        <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-100 relative overflow-hidden">
+        <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative overflow-hidden">
             {/* Background decorative elements */}
             <div className="absolute top-0 left-0 w-full h-full">
-                <div className="absolute top-20 left-20 w-32 h-32 bg-amber-200 rounded-full opacity-20 animate-pulse"></div>
-                <div className="absolute bottom-20 right-20 w-24 h-24 bg-orange-300 rounded-full opacity-30 animate-bounce"></div>
-                <div className="absolute top-1/2 left-10 w-16 h-16 bg-yellow-200 rounded-full opacity-25"></div>
+                <div className="absolute top-20 left-20 w-32 h-32 bg-blue-200 rounded-full opacity-20 animate-pulse"></div>
+                <div className="absolute bottom-20 right-20 w-24 h-24 bg-indigo-300 rounded-full opacity-30 animate-bounce"></div>
+                <div className="absolute top-1/2 left-10 w-16 h-16 bg-slate-200 rounded-full opacity-25"></div>
             </div>
             
-            <div className="max-w-md w-full mx-4 relative z-10">
+            <div className="max-w-sm sm:max-w-md w-full mx-4 relative z-10">
                 <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/20 overflow-hidden transform hover:scale-[1.02] transition-all duration-300">
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600 px-8 py-8 relative">
+                    <div className="bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 px-8 py-8 relative">
                         <div className="absolute inset-0 bg-black/10"></div>
                         <div className="relative z-10 text-center">
                             <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
@@ -60,15 +71,20 @@ export default function Login() {
                             <h1 className="text-3xl font-bold text-white tracking-wide drop-shadow-sm">
                                 Bem-vindo de volta!
                             </h1>
-                            <p className="text-amber-100 mt-2 text-sm font-medium">
+                            <p className="text-blue-100 mt-2 text-sm font-medium">
                                 Entre na sua conta para continuar
                             </p>
                         </div>
                     </div>
 
                     {/* Form */}
-                    <div className="px-8 py-10">
+                    <div className="px-6 sm:px-8 py-8 sm:py-10">
                         <form className="space-y-6" onSubmit={handleLogin}>
+                            {error && (
+                                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+                                    {error}
+                                </div>
+                            )}
                             <div className="space-y-2">
                                 <label className="block text-sm font-semibold text-gray-700 mb-3">
                                     📧 E-mail
@@ -80,7 +96,7 @@ export default function Login() {
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         required
-                                        className="w-full px-4 py-4 pl-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-400 focus:outline-none transition-all duration-300 bg-gray-50 focus:bg-white placeholder-gray-400 text-gray-800 font-medium shadow-sm hover:shadow-md"
+                                        className="w-full px-4 py-4 pl-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 focus:outline-none transition-all duration-300 bg-gray-50 focus:bg-white placeholder-gray-400 text-gray-800 font-medium shadow-sm hover:shadow-md"
                                     />
                                     <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -101,7 +117,7 @@ export default function Login() {
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
-                                        className="w-full px-4 py-4 pl-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-400 focus:outline-none transition-all duration-300 bg-gray-50 focus:bg-white placeholder-gray-400 text-gray-800 font-medium shadow-sm hover:shadow-md"
+                                        className="w-full px-4 py-4 pl-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 focus:outline-none transition-all duration-300 bg-gray-50 focus:bg-white placeholder-gray-400 text-gray-800 font-medium shadow-sm hover:shadow-md"
                                     />
                                     <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -113,10 +129,10 @@ export default function Login() {
 
                             <div className="flex items-center justify-between pt-2">
                                 <label className="flex items-center group cursor-pointer">
-                                    <input type="checkbox" className="rounded border-gray-300 text-amber-600 focus:ring-amber-500 focus:ring-2 transition-all" />
+                                    <input type="checkbox" className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 focus:ring-2 transition-all" />
                                     <span className="ml-3 text-sm text-gray-600 group-hover:text-gray-800 transition-colors font-medium">Lembrar-me</span>
                                 </label>
-                                <a href="#" className="text-sm text-amber-600 hover:text-amber-700 font-semibold hover:underline transition-all">
+                                <a href="#" className="text-sm text-indigo-600 hover:text-indigo-700 font-semibold hover:underline transition-all">
                                     Esqueceu a senha?
                                 </a>
                             </div>
@@ -124,7 +140,7 @@ export default function Login() {
                             <button 
                                 type="submit"
                                 disabled={carregando}
-                                className="w-full bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white py-4 px-6 rounded-xl font-bold text-lg hover:from-amber-600 hover:via-orange-600 hover:to-amber-700 transform hover:scale-[1.02] hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-lg relative overflow-hidden"
+                                className="w-full bg-gradient-to-r from-indigo-500 via-blue-500 to-indigo-600 text-white py-4 px-6 rounded-xl font-bold text-lg hover:from-indigo-600 hover:via-blue-600 hover:to-indigo-700 transform hover:scale-[1.02] hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-lg relative overflow-hidden"
                             >
                                 <div className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                                 <span className="relative z-10 flex items-center justify-center gap-2">
@@ -156,7 +172,7 @@ export default function Login() {
                             </div>
                             <p className="text-gray-600 text-sm font-medium">
                                 Não tem uma conta?{' '}
-                                <a href="/pages/register" className="text-amber-600 hover:text-amber-700 font-bold hover:underline transition-all">
+                                <a href="/pages/register" className="text-indigo-600 hover:text-indigo-700 font-bold hover:underline transition-all">
                                     Cadastre-se gratuitamente
                                 </a>
                             </p>

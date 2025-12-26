@@ -1,9 +1,8 @@
 "use client"
 import { useState, useEffect } from "react"
-import { useRealTime, useAuth } from "../hooks/useRealTime"
 import { Sidebar } from "../components/Sidebar"
+import { getApiUrl, getStatsEndpoint, getStatsMesEndpoint } from "../utils/security"
 import { TutorialModal } from "../components/TutorialModal"
-import { timeUtils } from "../utils/time"
 
 interface StatsData {
   novas_conversas?: number
@@ -15,73 +14,81 @@ interface StatsData {
 }
 
 export default function Dashboard() {
-  const { getHeaders } = useAuth()
-  const [selectedDate, setSelectedDate] = useState(timeUtils.getFilters().hoje)
-  const [selectedMonth, setSelectedMonth] = useState(timeUtils.getFilters().mesAtual)
+  const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0])
+  const [selectedMonth, setSelectedMonth] = useState(() => new Date().toISOString().slice(0, 7))
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [tutorialOpen, setTutorialOpen] = useState(false)
+  const [statsData, setStatsData] = useState<StatsData | null>(null)
+  const [statsMes, setStatsMes] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
 
-  const { data: statsData, loading: statsLoading, lastUpdate }: {
-    data: StatsData | null
-    loading: boolean
-    lastUpdate: Date | null
-  } = useRealTime(async () => {
+  const fetchData = async () => {
     try {
       const token = localStorage.getItem('token')
-      const headers: any = {
-        'Content-Type': 'application/json'
-      }
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`
-      }
-      
-      const response = await fetch(`http://192.168.120.249:8080/conversas/stats?data=${selectedDate}`, {
+      const headers: any = { 'Content-Type': 'application/json' }
+      if (token) headers['Authorization'] = `Bearer ${token}`
+
+      const response = await fetch(`${getStatsEndpoint()}?data=${selectedDate}`, {
         method: 'GET',
         mode: 'cors',
         headers
       })
-      if (!response.ok) {
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log('📊 Dados da API recebidos:', data)
+        setStatsData(data)
+        setLastUpdate(new Date())
+      } else {
         console.log('API Response:', response.status, response.statusText)
-        return null
+        setStatsData(null)
       }
-      const data = await response.json()
-      console.log('📊 Dados da API recebidos:', data)
-      return data
     } catch (error) {
       console.error('Erro ao buscar dados:', error)
-      return null
+      setStatsData(null)
     }
-  }, 30000, [selectedDate])
+  }
 
-  const { data: statsMes } = useRealTime(async () => {
+  const fetchMonthlyData = async () => {
     try {
       const token = localStorage.getItem('token')
-      const headers: any = {
-        'Content-Type': 'application/json'
-      }
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`
-      }
-      
-      const response = await fetch(`http://192.168.120.249:8080/conversas/stats-mes?mes=${selectedMonth}`, {
+      const headers: any = { 'Content-Type': 'application/json' }
+      if (token) headers['Authorization'] = `Bearer ${token}`
+
+      const response = await fetch(`${getStatsMesEndpoint()}?mes=${selectedMonth}`, {
         method: 'GET',
         mode: 'cors',
         headers
       })
-      if (!response.ok) {
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log('📅 Dados mensais da API:', data)
+        setStatsMes(data)
+      } else {
         console.log('API Monthly Response:', response.status, response.statusText)
-        return null
+        setStatsMes(null)
       }
-      const data = await response.json()
-      console.log('📅 Dados mensais da API:', data)
-      return data
     } catch (error) {
       console.error('Erro ao buscar dados mensais:', error)
-      return null
+      setStatsMes(null)
     }
-  }, 60000, [selectedMonth])
+  }
 
-  if (statsLoading && !statsData) {
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true)
+      await Promise.all([fetchData(), fetchMonthlyData()])
+      setLoading(false)
+    }
+    loadData()
+
+    const interval = setInterval(fetchData, 30000)
+    return () => clearInterval(interval)
+  }, [selectedDate, selectedMonth])
+
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
         <div className="text-center">
@@ -176,7 +183,7 @@ export default function Dashboard() {
             <div className="mb-4 flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-3">
               <div className="flex items-center space-x-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-sm text-blue-800">Última atualização: {lastUpdate ? lastUpdate.toLocaleTimeString() : 'Carregando...'}</span>
+                <span className="text-sm text-blue-800">Última atualização: {lastUpdate.toLocaleTimeString()}</span>
               </div>
               <div className="text-xs text-blue-600">Atualizando a cada 30s</div>
             </div>
@@ -272,24 +279,37 @@ export default function Dashboard() {
 
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-4 sm:p-6">
             <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Conversas por Hora - Diário</h3>
-            <div className="h-64 flex items-end justify-between space-x-1">
-              {Array.from({length: 24}, (_, i) => {
-                const hourData = statsData?.grafico_horas?.find((item: any) => item.hora === i)
-                const total = hourData?.total || 0
-                const maxTotal = Math.max(...(statsData?.grafico_horas?.map((h: any) => h.total) || [1]))
-                const height = maxTotal > 0 ? (total / maxTotal) * 200 : 0
-                
-                return (
-                  <div key={i} className="flex flex-col items-center flex-1">
-                    <div className="text-xs font-medium text-gray-600 mb-1">{total}</div>
+            <div className="h-48 sm:h-64 flex items-end justify-between space-x-1 overflow-x-auto">
+              {statsData?.grafico_horas && Array.isArray(statsData.grafico_horas) && statsData.grafico_horas.length > 0 ? (
+                statsData.grafico_horas.map((hourData: any, index: number) => {
+                  const total = hourData?.total || 0
+                  const hora = hourData?.hora || index
+                  const maxTotal = Math.max(...(statsData.grafico_horas?.map((h: any) => h.total || 0) || [1]))
+                  const height = maxTotal > 0 ? (total / maxTotal) * 180 : 0
+                  
+                  return (
+                    <div key={hora} className="flex flex-col items-center flex-1 min-w-0">
+                      <div className="text-xs font-medium text-gray-600 mb-1">{total}</div>
+                      <div 
+                        className="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-sm transition-all duration-500 hover:from-blue-600 hover:to-blue-500"
+                        style={{ height: `${height}px`, minHeight: total > 0 ? '4px' : '2px' }}
+                      ></div>
+                      <div className="text-xs sm:text-sm text-gray-500 mt-1 -rotate-45 origin-center">{hora}h</div>
+                    </div>
+                  )
+                })
+              ) : (
+                Array.from({length: 24}, (_, i) => (
+                  <div key={i} className="flex flex-col items-center flex-1 min-w-0">
+                    <div className="text-xs font-medium text-gray-600 mb-1">0</div>
                     <div 
-                      className="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-sm transition-all duration-500 hover:from-blue-600 hover:to-blue-500"
-                      style={{ height: `${height}px`, minHeight: total > 0 ? '4px' : '2px' }}
+                      className="w-full bg-gray-200 rounded-t-sm"
+                      style={{ height: '2px' }}
                     ></div>
-                    <div className="text-xs text-gray-500 mt-1 transform -rotate-45 origin-center">{i}h</div>
+                    <div className="text-xs sm:text-sm text-gray-500 mt-1 -rotate-45 origin-center">{i}h</div>
                   </div>
-                )
-              })}
+                ))
+              )}
             </div>
           </div>
         </div>

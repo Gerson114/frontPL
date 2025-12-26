@@ -4,41 +4,42 @@ import { Sidebar } from "../components/Sidebar"
 
 export default function Relatorios() {
   const [statsMes, setStatsMes] = useState<any>(null)
-  const [statsData, setStatsData] = useState<any>(null)
-  const [selectedMonth, setSelectedMonth] = useState('2025-12')
+  const [selectedMonth, setSelectedMonth] = useState(() => new Date().toISOString().slice(0, 7))
   const [loading, setLoading] = useState(true)
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  useEffect(() => {
-    loadData()
-  }, [selectedMonth])
-
-  async function loadData() {
+  const loadData = async () => {
     setLoading(true)
     try {
       const token = localStorage.getItem('token')
-      const headers: any = {
-        'Content-Type': 'application/json'
-      }
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`
-      }
+      const headers: any = { 'Content-Type': 'application/json' }
+      if (token) headers['Authorization'] = `Bearer ${token}`
 
-      const [mesStats, dataStats] = await Promise.all([
-        fetch(`http://192.168.120.249:8080/conversas/stats-mes?mes=${selectedMonth}`, { headers }).then(r => r.ok ? r.json() : null),
-        fetch(`http://192.168.120.249:8080/conversas/stats?data=${selectedMonth}-10`, { headers }).then(r => r.ok ? r.json() : null)
-      ])
-      
-      console.log('📊 Stats Mês da API:', mesStats)
-      console.log('📅 Stats Data da API:', dataStats)
-      setStatsMes(mesStats)
-      setStatsData(dataStats)
+      const response = await fetch(`http://192.168.120.249:8080/conversas/stats-mes?mes=${selectedMonth}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log('📊 Stats Mês da API:', data)
+        setStatsMes(data)
+      } else {
+        console.log('API Response:', response.status, response.statusText)
+        setStatsMes(null)
+      }
     } catch (error) {
       console.error('Erro:', error)
+      setStatsMes(null)
     } finally {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    loadData()
+  }, [selectedMonth])
 
   if (loading) {
     return (
@@ -50,16 +51,13 @@ export default function Relatorios() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex">
-      {/* Sidebar */}
       <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <Sidebar currentPage="relatorios" />
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 lg:ml-0">
-        {/* Top Bar */}
         <div className="bg-white/95 backdrop-blur-sm shadow-lg border-b border-gray-100">
           <div className="px-4 sm:px-6 py-4">
             <div className="flex items-center justify-between">
@@ -105,9 +103,7 @@ export default function Relatorios() {
           </div>
         </div>
 
-        {/* Content */}
         <div className="p-4 sm:p-6">
-          {/* Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
             <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 sm:p-6 hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
@@ -126,8 +122,8 @@ export default function Relatorios() {
             <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 sm:p-6 hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Pendentes Antes</p>
-                  <p className="text-2xl sm:text-3xl font-bold text-yellow-600">{statsMes?.pendentes_antes || 0}</p>
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Pendentes Anteriores</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-yellow-600">{statsMes?.pendentes_anteriores || 0}</p>
                 </div>
                 <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center ml-3">
                   <svg className="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -140,7 +136,7 @@ export default function Relatorios() {
             <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 sm:p-6 hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Total Concluidos</p>
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Total Concluídos</p>
                   <p className="text-2xl sm:text-3xl font-bold text-green-600">{statsMes?.total_concluidos || 0}</p>
                 </div>
                 <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center ml-3">
@@ -170,20 +166,6 @@ export default function Relatorios() {
             <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 sm:p-6 hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Total Novos</p>
-                  <p className="text-2xl sm:text-3xl font-bold text-indigo-600">{statsMes?.total_novos || 0}</p>
-                </div>
-                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center ml-3">
-                  <svg className="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 sm:p-6 hover:shadow-xl transition-shadow">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
                   <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Total Pendentes</p>
                   <p className="text-2xl sm:text-3xl font-bold text-red-600">{statsMes?.total_pendentes || 0}</p>
                 </div>
@@ -194,29 +176,23 @@ export default function Relatorios() {
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Resumo do Mês */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 sm:p-6 mb-6 sm:mb-8">
-            <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Resumo do Mês</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl">
-                <p className="text-sm text-gray-600 mb-1">Novas Conversas</p>
-                <p className="text-2xl font-bold text-blue-600">{statsMes?.novas_conversas || 0}</p>
-              </div>
-              <div className="p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-xl">
-                <p className="text-sm text-gray-600 mb-1">Concluídas</p>
-                <p className="text-2xl font-bold text-green-600">{statsMes?.concluidas || 0}</p>
-              </div>
-              <div className="p-4 bg-gradient-to-r from-indigo-50 to-indigo-100 rounded-xl">
-                <p className="text-sm text-gray-600 mb-1">Todas Conversas</p>
-                <p className="text-2xl font-bold text-indigo-600">{statsMes?.todas_conversas || 0}</p>
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 sm:p-6 hover:shadow-xl transition-shadow">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Total Conversas</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-indigo-600">{(statsMes?.novas_conversas || 0) + (statsMes?.total_concluidos || 0) + (statsMes?.total_em_andamento || 0)}</p>
+                </div>
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center ml-3">
+                  <svg className="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Gráfico por Dia do Mês */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-4 sm:p-6 mb-6 sm:mb-8">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-4 sm:p-6">
             <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Conversas por Dia do Mês</h3>
             <div className="h-64 flex items-end justify-between space-x-1 overflow-x-auto">
               {Array.from({length: 31}, (_, i) => {
@@ -239,29 +215,9 @@ export default function Relatorios() {
               })}
             </div>
           </div>
-
-          {/* Resumo Final */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 sm:p-6">
-            <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Resumo Final</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl">
-                <p className="text-sm text-gray-600 mb-1">Em Andamento</p>
-                <p className="text-2xl font-bold text-purple-600">{statsMes?.em_andamento || 0}</p>
-              </div>
-              <div className="p-4 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-xl">
-                <p className="text-sm text-gray-600 mb-1">Pendentes Anteriores</p>
-                <p className="text-2xl font-bold text-yellow-600">{statsMes?.pendentes_anteriores || 0}</p>
-              </div>
-              <div className="p-4 bg-gradient-to-r from-red-50 to-red-100 rounded-xl">
-                <p className="text-sm text-gray-600 mb-1">Pendente do Dia</p>
-                <p className="text-2xl font-bold text-red-600">{statsMes?.pendente_do_dia || 0}</p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
-      {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"

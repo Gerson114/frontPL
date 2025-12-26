@@ -1,19 +1,20 @@
 "use client"
 import { useState } from "react"
 import { useRealTime, useAuth } from "../hooks/useRealTime"
+import { getConversasAllEndpoint } from "../utils/security"
 
 export default function ConversasPage() {
   const { getHeaders } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  const { data: conversas, loading } = useRealTime(async () => {
+  const { data: conversas, loading }: { data: any, loading: boolean } = useRealTime(async () => {
     const headers = getHeaders()
     if (!headers) return null
-    const response = await fetch(`http://192.168.120.249:8080/conversas/all`, { headers })
+    const response = await fetch(getConversasAllEndpoint(), { headers })
     return response.json()
   }, 30000)
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
       case 'concluido': return 'bg-green-100 text-green-800'
       case 'em_andamento': return 'bg-blue-100 text-blue-800'
@@ -23,7 +24,7 @@ export default function ConversasPage() {
     }
   }
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('pt-BR')
   }
 
@@ -43,7 +44,56 @@ export default function ConversasPage() {
       <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
-        <Sidebar currentPage="conversas" />
+        <div className="flex items-center justify-center h-16 bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600">
+          <h1 className="text-xl font-bold text-white tracking-wide">FrontPlanner</h1>
+        </div>
+        
+        <nav className="mt-8 flex-1">
+          <div className="px-4 space-y-2">
+            <a href="/dashboard" className="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+              <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+              </svg>
+              Dashboard
+            </a>
+            
+            <a href="#" className="flex items-center px-4 py-3 text-gray-700 bg-blue-50 rounded-lg">
+              <svg className="w-5 h-5 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+              Conversas
+            </a>
+            
+            <a href="/atendentes" className="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+              <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              Atendentes
+            </a>
+            
+            <a href="/relatorios" className="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+              <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              Relatórios
+            </a>
+          </div>
+          
+          <div className="absolute bottom-4 left-4 right-4">
+            <button
+              onClick={() => {
+                localStorage.removeItem('token')
+                window.location.href = '/pages/login'
+              }}
+              className="flex items-center w-full px-4 py-3 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors"
+            >
+              <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Sair
+            </button>
+          </div>
+        </nav>
       </div>
 
       {/* Main Content */}
@@ -79,9 +129,9 @@ export default function ConversasPage() {
             </div>
             <div className="p-6">
               {Array.isArray(conversas) && conversas.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {conversas.map((conversa, index) => (
-                    <div key={index} className="bg-gradient-to-br from-white to-gray-50 rounded-lg p-4 border border-gray-200 hover:shadow-lg transition-all duration-300">
+                    <div key={index} className="bg-gradient-to-br from-white to-gray-50 rounded-lg p-3 sm:p-4 border border-gray-200 hover:shadow-lg transition-all duration-300">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
                           <div className="flex items-center space-x-3 mb-2">
@@ -101,7 +151,7 @@ export default function ConversasPage() {
                             </p>
                           )}
                         </div>
-                        <div className="text-right text-sm text-gray-500">
+                        <div className="text-right text-xs sm:text-sm text-gray-500">
                           <p>Criado: {formatDate(conversa.data_criacao)}</p>
                           {conversa.data_atualizacao && (
                             <p>Atualizado: {formatDate(conversa.data_atualizacao)}</p>

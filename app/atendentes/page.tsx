@@ -2,16 +2,17 @@
 import { useState, useEffect } from "react"
 import { useRealTime, useAuth } from "../hooks/useRealTime"
 import { timeUtils } from "../utils/time"
+import { getDashAtendentesEndpoint } from "../utils/security"
 
 export default function AtendentesPage() {
   const { getHeaders } = useAuth()
   const [selectedDate, setSelectedDate] = useState(timeUtils.getFilters().hoje)
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  const { data: atendentesData, loading } = useRealTime(async () => {
+  const { data: atendentesData, loading }: { data: any, loading: boolean } = useRealTime(async () => {
     const headers = getHeaders()
     if (!headers) return null
-    const response = await fetch(`http://192.168.120.249:8080/conversas/dash-atendentes?data=${selectedDate}`, { headers })
+    const response = await fetch(`${getDashAtendentesEndpoint()}?data=${selectedDate}`, { headers })
     const data = await response.json()
     console.log('Dados dos atendentes:', data)
     return data
@@ -20,7 +21,7 @@ export default function AtendentesPage() {
   const atendentes = Array.isArray(atendentesData) ? atendentesData : []
   console.log('Array de atendentes processado:', atendentes)
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
       case 'online': return 'bg-green-500'
       case 'ocupado': return 'bg-yellow-500'
@@ -29,7 +30,7 @@ export default function AtendentesPage() {
     }
   }
 
-  const getStatusText = (status) => {
+  const getStatusText = (status: string) => {
     switch (status?.toLowerCase()) {
       case 'online': return 'Online'
       case 'ocupado': return 'Ocupado'
@@ -38,7 +39,7 @@ export default function AtendentesPage() {
     }
   }
 
-  const getRankIcon = (index) => {
+  const getRankIcon = (index: number) => {
     switch (index) {
       case 0: return '🥇'
       case 1: return '🥈'
@@ -48,17 +49,17 @@ export default function AtendentesPage() {
   }
 
   // Ordenar por satisfação e tempo de resposta
-  const sortedAtendentes = [...atendentes].sort((a, b) => {
+  const sortedAtendentes = [...atendentes].sort((a: any, b: any) => {
     const scoreA = (a.satisfacao || 0) * 10 - timeUtils.parseTimeToMinutes(a.tempo_medio_resposta || '00:00:00')
     const scoreB = (b.satisfacao || 0) * 10 - timeUtils.parseTimeToMinutes(b.tempo_medio_resposta || '00:00:00')
     return scoreB - scoreA
   })
 
-  const onlineCount = atendentes.filter(a => a.status === 'online').length
-  const ocupadoCount = atendentes.filter(a => a.status === 'ocupado').length
-  const totalAtendimentos = atendentes.reduce((sum, a) => sum + (a.total_atendimentos || 0), 0)
+  const onlineCount = atendentes.filter((a: any) => a.status === 'online').length
+  const ocupadoCount = atendentes.filter((a: any) => a.status === 'ocupado').length
+  const totalAtendimentos = atendentes.reduce((sum: number, a: any) => sum + (a.total_atendimentos || 0), 0)
   const mediaSatisfacao = atendentes.length > 0 ? 
-    atendentes.reduce((sum, a) => sum + (a.satisfacao || 0), 0) / atendentes.length : 0
+    atendentes.reduce((sum: number, a: any) => sum + (a.satisfacao || 0), 0) / atendentes.length : 0
 
   if (loading && !atendentesData) {
     return (
