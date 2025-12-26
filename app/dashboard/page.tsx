@@ -22,7 +22,11 @@ interface StatsMes {
 }
 
 export default function Dashboard() {
-  const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0])
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const yesterday = new Date()
+    yesterday.setDate(yesterday.getDate() - 1)
+    return yesterday.toISOString().split('T')[0]
+  })
   const [selectedMonth, setSelectedMonth] = useState(() => new Date().toISOString().slice(0, 7))
   const [tutorialOpen, setTutorialOpen] = useState(false)
   const [statsData, setStatsData] = useState<StatsData | null>(null)
@@ -128,6 +132,11 @@ export default function Dashboard() {
                       type="date"
                       value={selectedDate}
                       onChange={(e) => setSelectedDate(e.target.value)}
+                      max={(() => {
+                        const yesterday = new Date()
+                        yesterday.setDate(yesterday.getDate() - 1)
+                        return yesterday.toISOString().split('T')[0]
+                      })()}
                       className="px-3 py-2 border-0 bg-white rounded-lg focus:ring-2 focus:ring-blue-500 text-sm shadow-sm hover:shadow-md transition-all cursor-pointer text-gray-900 font-medium"
                       style={{
                         colorScheme: 'light',
