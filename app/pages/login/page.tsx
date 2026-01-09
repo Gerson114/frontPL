@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import { sanitizeInput, validateEmail, validatePassword, getLoginEndpoint } from "../../utils/security"
+import { sanitizeInput, validateEmail, validatePassword } from "../../utils/security"
 
 export default function Login() {
     const [email, setEmail] = useState('')

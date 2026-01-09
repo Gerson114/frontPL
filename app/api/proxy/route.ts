@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+const BACKEND_URL = 'https://dashplanner.onrender.com';
+
 export async function GET(request: NextRequest) {
   try {
     const token = request.cookies.get('token')?.value;
@@ -12,7 +14,7 @@ export async function GET(request: NextRequest) {
     const apiPath = url.searchParams.get('path') || '';
     const query = url.searchParams.get('query') || '';
     
-    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}${apiPath}${query ? `?${query}` : ''}`;
+    const apiUrl = `${BACKEND_URL}${apiPath}${query ? `?${query}` : ''}`;
     
     const response = await fetch(apiUrl, {
       method: 'GET',

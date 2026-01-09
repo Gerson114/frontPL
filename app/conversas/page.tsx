@@ -1,7 +1,6 @@
 "use client"
 import { useState } from "react"
 import { useRealTime, useAuth } from "../hooks/useRealTime"
-import { getConversasAllEndpoint } from "../utils/security"
 
 export default function ConversasPage() {
   const { getHeaders } = useAuth()
