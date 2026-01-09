@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
     }
 
     const apiUrl = `${BACKEND_URL}${path}`;
+    console.log('POST to:', apiUrl);
     
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -62,6 +63,7 @@ export async function GET(request: NextRequest) {
     const query = url.searchParams.get('query') || '';
     
     const apiUrl = `${BACKEND_URL}${apiPath}${query ? `?${query}` : ''}`;
+    console.log('GET to:', apiUrl);
     
     const response = await fetch(apiUrl, {
       method: 'GET',
