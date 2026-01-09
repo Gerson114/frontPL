@@ -1,6 +1,7 @@
 "use client"
 import { useState } from "react"
 import { sanitizeInput, validateEmail, validatePassword } from "../../utils/security"
+import { API_URLS } from "../../utils/api"
 
 export default function Register() {
     const [nome, setNome] = useState('')
@@ -42,7 +43,7 @@ export default function Register() {
         setCarregando(true)
         
         try {
-            const response = await fetch('/api/auth/register', {
+            const response = await fetch(API_URLS.REGISTER, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
@@ -55,7 +56,7 @@ export default function Register() {
 
             const data = await response.json()
             
-            if (data.success) {
+            if (response.ok) {
                 alert('Conta criada com sucesso!')
                 window.location.href = '/pages/login'
             } else {

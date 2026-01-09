@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { API_URLS } from '../utils/api'
 
 export const useRealTime = (fetchFunction, interval = 30000, dependencies = []) => {
   const [data, setData] = useState(null)
@@ -33,7 +34,7 @@ export const useRealTime = (fetchFunction, interval = 30000, dependencies = []) 
 export const useAuth = () => {
   const checkAuth = async () => {
     try {
-      const response = await fetch('/api/auth/verify', {
+      const response = await fetch(API_URLS.VERIFY, {
         method: 'GET'
       })
       return response.ok
@@ -50,7 +51,7 @@ export const useAuth = () => {
 
   const logout = async () => {
     try {
-      await fetch('/api/auth/logout', {
+      await fetch(API_URLS.LOGOUT, {
         method: 'POST'
       })
     } catch (error) {

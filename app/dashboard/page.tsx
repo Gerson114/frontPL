@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react"
 import { Sidebar } from "../components/Sidebar"
 import { TutorialModal } from "../components/TutorialModal"
+import { API_URLS } from "../utils/api"
 
 interface StatsData {
   novas_conversas?: number
@@ -36,19 +37,26 @@ export default function Dashboard() {
 
   // Verificar autenticação
   useEffect(() => {
-    // Não precisa verificar token no localStorage pois agora usa httpOnly cookies
-    // A autenticação será verificada automaticamente nas requisições
+    const token = localStorage.getItem('token')
+    if (!token) {
+      window.location.href = '/pages/login'
+    }
   }, [])
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`/api/proxy?path=/conversas/stats&query=data=${selectedDate}`)
+      const token = localStorage.getItem('token')
+      const response = await fetch(`${API_URLS.CONVERSAS_STATS}?data=${selectedDate}`, {
+        method: 'GET',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      })
 
       if (response.ok) {
         const data = await response.json()
         setStatsData(data)
         setLastUpdate(new Date())
       } else if (response.status === 401) {
+        localStorage.clear()
         window.location.href = '/pages/login'
       } else {
         setStatsData(null)
@@ -60,12 +68,17 @@ export default function Dashboard() {
 
   const fetchMonthlyData = async () => {
     try {
-      const response = await fetch(`/api/proxy?path=/conversas/stats-mes&query=mes=${selectedMonth}`)
+      const token = localStorage.getItem('token')
+      const response = await fetch(`${API_URLS.CONVERSAS_STATS_MES}?mes=${selectedMonth}`, {
+        method: 'GET',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      })
 
       if (response.ok) {
         const data = await response.json()
         setStatsMes(data)
       } else if (response.status === 401) {
+        localStorage.clear()
         window.location.href = '/pages/login'
       } else {
         setStatsMes(null)
@@ -185,7 +198,6 @@ export default function Dashboard() {
                   
                   <button
                     onClick={async () => {
-                      await fetch('/api/auth/logout', { method: 'POST' })
                       window.location.href = '/pages/login'
                     }}
                     className="flex items-center justify-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-sm hover:shadow-md flex-1 sm:flex-none"

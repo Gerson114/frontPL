@@ -1,23 +1,14 @@
-export const getApiUrl = () => {
-  // Se estiver na Netlify, usar Netlify Functions
-  if (typeof window !== 'undefined' && window.location.hostname.includes('netlify.app')) {
-    return '/.netlify/functions/proxy'
-  }
-  // Caso contrário, usar Next.js API Routes (localhost)
-  return '/api/proxy'
-}
-
-export const makeApiCall = async (method: 'GET' | 'POST', params: any) => {
-  const apiUrl = getApiUrl()
-  
-  if (method === 'GET') {
-    const queryParams = new URLSearchParams(params).toString()
-    return fetch(`${apiUrl}?${queryParams}`)
-  }
-  
-  return fetch(apiUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(params)
-  })
+// Utilitário para URLs da API
+export const API_URLS = {
+  BASE: process.env.NEXT_PUBLIC_BACKEND_URL || 'https://teste.agenciaplanner.dev',
+  LOGIN: `${process.env.NEXT_PUBLIC_BACKEND_URL || 'https://teste.agenciaplanner.dev'}${process.env.NEXT_PUBLIC_LOGIN_ENDPOINT || '/login'}`,
+  REGISTER: `${process.env.NEXT_PUBLIC_BACKEND_URL || 'https://teste.agenciaplanner.dev'}${process.env.NEXT_PUBLIC_REGISTER_ENDPOINT || '/register'}`,
+  LOGOUT: `${process.env.NEXT_PUBLIC_BACKEND_URL || 'https://teste.agenciaplanner.dev'}${process.env.NEXT_PUBLIC_LOGOUT_ENDPOINT || '/logout'}`,
+  VERIFY: `${process.env.NEXT_PUBLIC_BACKEND_URL || 'https://teste.agenciaplanner.dev'}${process.env.NEXT_PUBLIC_VERIFY_ENDPOINT || '/verify'}`,
+  CONVERSAS: `${process.env.NEXT_PUBLIC_BACKEND_URL || 'https://teste.agenciaplanner.dev'}${process.env.NEXT_PUBLIC_CONVERSAS_ENDPOINT || '/conversas'}`,
+  CONVERSAS_ALL: `${process.env.NEXT_PUBLIC_BACKEND_URL || 'https://teste.agenciaplanner.dev'}${process.env.NEXT_PUBLIC_CONVERSAS_ALL_ENDPOINT || '/conversas/all'}`,
+  CONVERSAS_STATS: `${process.env.NEXT_PUBLIC_BACKEND_URL || 'https://teste.agenciaplanner.dev'}${process.env.NEXT_PUBLIC_CONVERSAS_STATS_ENDPOINT || '/conversas/stats'}`,
+  CONVERSAS_STATS_MES: `${process.env.NEXT_PUBLIC_BACKEND_URL || 'https://teste.agenciaplanner.dev'}${process.env.NEXT_PUBLIC_CONVERSAS_STATS_MES_ENDPOINT || '/conversas/stats-mes'}`,
+  DASH_ATENDENTES: `${process.env.NEXT_PUBLIC_BACKEND_URL || 'https://teste.agenciaplanner.dev'}${process.env.NEXT_PUBLIC_DASH_ATENDENTES_ENDPOINT || '/conversas/dash-atendentes'}`,
+  MENSAGENS: `${process.env.NEXT_PUBLIC_BACKEND_URL || 'https://teste.agenciaplanner.dev'}${process.env.NEXT_PUBLIC_MENSAGENS_ENDPOINT || '/mensagens'}`
 }

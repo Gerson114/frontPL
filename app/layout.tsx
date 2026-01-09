@@ -65,8 +65,7 @@ export default function RootLayout({
                         </div>
                         
                         <button
-                          onClick={async () => {
-                            await fetch('/api/auth/logout', { method: 'POST' })
+                          onClick={() => {
                             window.location.href = '/pages/login'
                           }}
                           className="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-sm hover:shadow-md"

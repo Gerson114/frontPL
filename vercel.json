@@ -7,5 +7,18 @@
     "app/api/**/*.ts": {
       "maxDuration": 30
     }
+  },
+  "env": {
+    "BACKEND_URL": "https://teste.agenciaplanner.dev/",
+    "LOGIN_ENDPOINT": "/login",
+    "REGISTER_ENDPOINT": "/register",
+    "LOGOUT_ENDPOINT": "/logout",
+    "VERIFY_ENDPOINT": "/verify",
+    "CONVERSAS_ENDPOINT": "/conversas",
+    "CONVERSAS_ALL_ENDPOINT": "/conversas/all",
+    "CONVERSAS_STATS_ENDPOINT": "/conversas/stats",
+    "CONVERSAS_STATS_MES_ENDPOINT": "/conversas/stats-mes",
+    "DASH_ATENDENTES_ENDPOINT": "/conversas/dash-atendentes",
+    "MENSAGENS_ENDPOINT": "/mensagens"
   }
 }
