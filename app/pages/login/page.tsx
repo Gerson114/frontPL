@@ -1,6 +1,7 @@
 "use client"
 import { useState } from "react"
 import { sanitizeInput, validateEmail, validatePassword } from "../../utils/security"
+import { makeApiCall } from "../../utils/api"
 
 export default function Login() {
     const [email, setEmail] = useState('')
@@ -28,14 +29,10 @@ export default function Login() {
         setCarregando(true)
         
         try {
-            const response = await fetch('/api/proxy', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    path: '/login',
-                    email: sanitizedEmail, 
-                    password: sanitizedPassword 
-                })
+            const response = await makeApiCall('POST', {
+                path: '/login',
+                email: sanitizedEmail, 
+                password: sanitizedPassword 
             })
 
             const data = await response.json()

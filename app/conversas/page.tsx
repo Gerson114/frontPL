@@ -1,12 +1,13 @@
 "use client"
 import { useState } from "react"
 import { useRealTime, useAuth } from "../hooks/useRealTime"
+import { makeApiCall } from "../utils/api"
 
 export default function ConversasPage() {
   const { getHeaders } = useAuth()
 
   const { data: conversas, loading }: { data: any, loading: boolean } = useRealTime(async () => {
-    const response = await fetch('/api/proxy?path=/conversas/all')
+    const response = await makeApiCall('GET', { path: '/conversas/all' })
     if (response.status === 401) {
       window.location.href = '/pages/login'
       return []
