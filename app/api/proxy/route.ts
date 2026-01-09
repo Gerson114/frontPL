@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND_URL = 'https://dashplanner.onrender.com';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://teste.agenciaplanner.dev/';
 
 export async function POST(request: NextRequest) {
   try {
