@@ -1,0 +1,2 @@
+/  /pages/login  302
+/api/*  /.netlify/functions/:splat  200
