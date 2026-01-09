@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react"
 import { Sidebar } from "../components/Sidebar"
 import { TutorialModal } from "../components/TutorialModal"
-import { API_URLS } from "../utils/api"
 
 interface StatsData {
   novas_conversas?: number
@@ -46,7 +45,7 @@ export default function Dashboard() {
   const fetchData = async () => {
     try {
       const token = localStorage.getItem('token')
-      const response = await fetch(`${API_URLS.CONVERSAS_STATS}?data=${selectedDate}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/conversas/stats?data=${selectedDate}`, {
         method: 'GET',
         headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       })
@@ -69,7 +68,7 @@ export default function Dashboard() {
   const fetchMonthlyData = async () => {
     try {
       const token = localStorage.getItem('token')
-      const response = await fetch(`${API_URLS.CONVERSAS_STATS_MES}?mes=${selectedMonth}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/conversas/stats-mes?mes=${selectedMonth}`, {
         method: 'GET',
         headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       })

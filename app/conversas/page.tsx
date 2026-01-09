@@ -1,17 +1,26 @@
 "use client"
 import { useState } from "react"
 import { useRealTime, useAuth } from "../hooks/useRealTime"
-import { API_URLS } from "../utils/api"
 
 export default function ConversasPage() {
   const { getHeaders } = useAuth()
 
   const { data: conversas, loading }: { data: any, loading: boolean } = useRealTime(async () => {
-    const response = await fetch(API_URLS.CONVERSAS_ALL, {
-      method: 'GET',
-      credentials: 'include'
+    const token = localStorage.getItem('token')
+    if (!token) {
+      window.location.href = '/pages/login'
+      return []
+    }
+    
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/conversas/all`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
     })
+    
     if (response.status === 401) {
+      localStorage.removeItem('token')
       window.location.href = '/pages/login'
       return []
     }

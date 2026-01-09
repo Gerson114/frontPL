@@ -1,7 +1,6 @@
 "use client"
 import { useState } from "react"
 import { sanitizeInput, validateEmail, validatePassword } from "../../utils/security"
-import { API_URLS } from "../../utils/api"
 
 export default function Login() {
     const [email, setEmail] = useState('')
@@ -29,7 +28,7 @@ export default function Login() {
         setCarregando(true)
         
         try {
-            const response = await fetch(API_URLS.LOGIN, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: sanitizedEmail, password: sanitizedPassword })
@@ -42,10 +41,8 @@ export default function Login() {
 
             const data = await response.json()
             
-            if (response.ok && (data.success || data.acesso)) {
-                if (data.token) {
-                    localStorage.setItem('token', data.token)
-                }
+            if (response.ok && data.token) {
+                localStorage.setItem('token', data.token)
                 window.location.href = '/dashboard'
             } else {
                 setError(data.message || 'Credenciais inválidas')
