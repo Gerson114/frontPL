@@ -2,16 +2,17 @@
 import { useState } from "react"
 import { useRealTime, useAuth } from "../hooks/useRealTime"
 import { timeUtils } from "../utils/time"
-import { getDashAtendentesEndpoint } from "../utils/security"
 
 export default function AtendentesPage() {
   const { getHeaders } = useAuth()
   const [selectedDate, setSelectedDate] = useState(timeUtils.getFilters().hoje)
 
   const { data: atendentesData, loading }: { data: any, loading: boolean } = useRealTime(async () => {
-    const headers = getHeaders()
-    if (!headers) return null
-    const response = await fetch(`${getDashAtendentesEndpoint()}?data=${selectedDate}`, { headers })
+    const response = await fetch(`/api/proxy?path=/conversas/dash-atendentes&query=data=${selectedDate}`)
+    if (response.status === 401) {
+      window.location.href = '/pages/login'
+      return null
+    }
     return response.json()
   }, 15000, [selectedDate])
 

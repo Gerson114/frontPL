@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import { sanitizeInput, validateEmail, validatePassword, getRegisterEndpoint } from "../../utils/security"
+import { sanitizeInput, validateEmail, validatePassword } from "../../utils/security"
 
 export default function Register() {
     const [nome, setNome] = useState('')
@@ -42,7 +42,7 @@ export default function Register() {
         setCarregando(true)
         
         try {
-            const response = await fetch(getRegisterEndpoint(), {
+            const response = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
@@ -53,13 +53,13 @@ export default function Register() {
                 })
             })
 
-            if (response.ok) {
+            const data = await response.json()
+            
+            if (data.success) {
                 alert('Conta criada com sucesso!')
                 window.location.href = '/pages/login'
-            } else if (response.status === 429) {
-                setError('Muitas tentativas. Aguarde alguns minutos e tente novamente.')
             } else {
-                setError('Erro ao criar conta')
+                setError(data.message || 'Erro ao criar conta')
             }
         } catch (error) {
             setError('Erro de conexão')
