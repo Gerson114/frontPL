@@ -33,9 +33,8 @@ export const useRealTime = (fetchFunction, interval = 30000, dependencies = []) 
 export const useAuth = () => {
   const checkAuth = async () => {
     try {
-      const response = await fetch(`${getApiUrl()}/auth/verify`, {
-        method: 'GET',
-        credentials: 'include'
+      const response = await fetch('/api/auth/verify', {
+        method: 'GET'
       })
       return response.ok
     } catch {
@@ -51,9 +50,8 @@ export const useAuth = () => {
 
   const logout = async () => {
     try {
-      await fetch(`${getApiUrl()}/auth/logout`, {
-        method: 'POST',
-        credentials: 'include'
+      await fetch('/api/auth/logout', {
+        method: 'POST'
       })
     } catch (error) {
       console.error('Erro no logout:', error)

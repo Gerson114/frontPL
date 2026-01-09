@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://dashplanner.onrender.com';
+const BACKEND_URL = process.env.BACKEND_URL || 'https://teste.agenciaplanner.dev/';
 
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
 
-    const response = await fetch(`${BACKEND_URL}/login`, {
+    const response = await fetch(`${BACKEND_URL}${process.env.LOGIN_ENDPOINT}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
