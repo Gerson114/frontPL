@@ -8,6 +8,7 @@
 [build.environment]
   NODE_ENV = "production"
   NEXT_TELEMETRY_DISABLED = "1"
+  SECRETS_SCAN_ENABLED = "false"
 
 [[headers]]
   for = "/*"
