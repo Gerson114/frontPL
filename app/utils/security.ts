@@ -1,5 +1,9 @@
 export const sanitizeInput = (input: string): string => {
-  return input.trim().replace(/[<>\"'&]/g, '')
+  return input.trim()
+    .replace(/[<>"'&]/g, '')
+    .replace(/javascript:/gi, '')
+    .replace(/on\w+=/gi, '')
+    .slice(0, 1000) // Limit length
 }
 
 export const validateEmail = (email: string): boolean => {
@@ -8,11 +12,22 @@ export const validateEmail = (email: string): boolean => {
 }
 
 export const validatePassword = (password: string): boolean => {
-  return password.length >= 6
+  return password.length >= 8 && password.length <= 128
 }
 
 export const getApiUrl = (): string => {
   return process.env.NEXT_PUBLIC_API_URL || 'https://dashplanner.onrender.com'
+}
+
+export const makeAuthenticatedRequest = async (url: string, options: RequestInit = {}) => {
+  return fetch(url, {
+    ...options,
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers
+    }
+  })
 }
 
 export const getLoginEndpoint = (): string => {

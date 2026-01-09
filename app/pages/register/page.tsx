@@ -56,6 +56,8 @@ export default function Register() {
             if (response.ok) {
                 alert('Conta criada com sucesso!')
                 window.location.href = '/pages/login'
+            } else if (response.status === 429) {
+                setError('Muitas tentativas. Aguarde alguns minutos e tente novamente.')
             } else {
                 setError('Erro ao criar conta')
             }
@@ -67,164 +69,103 @@ export default function Register() {
     }
 
     return (
-        <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-full">
-                <div className="absolute top-20 left-20 w-32 h-32 bg-blue-200 rounded-full opacity-20 animate-pulse"></div>
-                <div className="absolute bottom-20 right-20 w-24 h-24 bg-indigo-300 rounded-full opacity-30 animate-bounce"></div>
-                <div className="absolute top-1/2 left-10 w-16 h-16 bg-slate-200 rounded-full opacity-25"></div>
+        <div className="min-h-screen flex justify-center items-center bg-[#f8fafc] relative overflow-hidden font-sans">
+            {/* Background Elements - Mais sutis e modernos */}
+            <div className="absolute inset-0 z-0">
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-100 rounded-full blur-[120px] opacity-60"></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-100 rounded-full blur-[120px] opacity-60"></div>
             </div>
             
-            <div className="max-w-sm sm:max-w-md w-full mx-4 relative z-10">
-                <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/20 overflow-hidden transform hover:scale-[1.02] transition-all duration-300">
-                    <div className="bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 px-8 py-8 relative">
-                        <div className="absolute inset-0 bg-black/10"></div>
-                        <div className="relative z-10 text-center">
-                            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
-                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                                </svg>
-                            </div>
-                            <h1 className="text-3xl font-bold text-white tracking-wide drop-shadow-sm">
-                                Criar Conta
-                            </h1>
-                            <p className="text-blue-100 mt-2 text-sm font-medium">
-                                Cadastre-se para começar
-                            </p>
+            <div className="max-w-md w-full mx-4 relative z-10">
+                <div className="bg-white rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-100 overflow-hidden">
+                    
+                    {/* Header - Minimalista e Profissional */}
+                    <div className="pt-10 pb-6 px-8 text-center">
+                        <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-indigo-200">
+                            <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                            </svg>
                         </div>
+                        <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                            Criar nova conta
+                        </h1>
+                        <p className="text-gray-500 mt-2 text-sm">
+                            Preencha os dados para acessar a plataforma
+                        </p>
                     </div>
 
-                    <div className="px-6 sm:px-8 py-8 sm:py-10">
-                        <form className="space-y-6" onSubmit={handleRegister}>
+                    <div className="px-8 pb-10">
+                        <form className="space-y-5" onSubmit={handleRegister}>
                             {error && (
-                                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
-                                    {error}
+                                <div className="p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-r-lg text-xs font-medium animate-in fade-in slide-in-from-top-1">
+                                    <div className="flex items-center">
+                                        <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
+                                        {error}
+                                    </div>
                                 </div>
                             )}
-                            <div className="space-y-2">
-                                <label className="block text-sm font-semibold text-gray-700 mb-3">
-                                    👤 Nome
-                                </label>
-                                <div className="relative">
-                                    <input 
-                                        type="text" 
-                                        placeholder="Seu nome completo"
-                                        value={nome}
-                                        onChange={(e) => setNome(e.target.value)}
-                                        required
-                                        className="w-full px-4 py-4 pl-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 focus:outline-none transition-all duration-300 bg-gray-50 focus:bg-white placeholder-gray-400 text-gray-800 font-medium shadow-sm hover:shadow-md"
-                                    />
-                                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <div className="space-y-2">
-                                <label className="block text-sm font-semibold text-gray-700 mb-3">
-                                    📧 E-mail
-                                </label>
-                                <div className="relative">
-                                    <input 
-                                        type="email" 
-                                        placeholder="seu@email.com"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        required
-                                        className="w-full px-4 py-4 pl-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 focus:outline-none transition-all duration-300 bg-gray-50 focus:bg-white placeholder-gray-400 text-gray-800 font-medium shadow-sm hover:shadow-md"
-                                    />
-                                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-                                        </svg>
+                            {/* Input Group */}
+                            {[
+                                { label: 'Nome Completo', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', value: nome, setter: setNome, type: 'text', placeholder: 'Ex: João Silva' },
+                                { label: 'E-mail profissional', icon: 'M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207', value: email, setter: setEmail, type: 'email', placeholder: 'seu@email.com' },
+                                { label: 'Senha', icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z', value: password, setter: setPassword, type: 'password', placeholder: '••••••••' },
+                                { label: 'Confirmar Senha', icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', value: confirmPassword, setter: setConfirmPassword, type: 'password', placeholder: '••••••••' }
+                            ].map((field, idx) => (
+                                <div key={idx} className="space-y-1.5">
+                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider ml-1">
+                                        {field.label}
+                                    </label>
+                                    <div className="relative group">
+                                        <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-600 transition-colors">
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={field.icon} />
+                                            </svg>
+                                        </div>
+                                        <input 
+                                            type={field.type}
+                                            value={field.value}
+                                            onChange={(e) => field.setter(e.target.value)}
+                                            required
+                                            placeholder={field.placeholder}
+                                            className="w-full px-4 py-3.5 pl-12 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all duration-200 text-gray-800 placeholder-gray-400"
+                                        />
                                     </div>
                                 </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="block text-sm font-semibold text-gray-700 mb-3">
-                                    🔒 Senha
-                                </label>
-                                <div className="relative">
-                                    <input 
-                                        type="password" 
-                                        placeholder="••••••••"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        required
-                                        className="w-full px-4 py-4 pl-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 focus:outline-none transition-all duration-300 bg-gray-50 focus:bg-white placeholder-gray-400 text-gray-800 font-medium shadow-sm hover:shadow-md"
-                                    />
-                                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="block text-sm font-semibold text-gray-700 mb-3">
-                                    🔐 Confirmar Senha
-                                </label>
-                                <div className="relative">
-                                    <input 
-                                        type="password" 
-                                        placeholder="••••••••"
-                                        value={confirmPassword}
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
-                                        required
-                                        className="w-full px-4 py-4 pl-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 focus:outline-none transition-all duration-300 bg-gray-50 focus:bg-white placeholder-gray-400 text-gray-800 font-medium shadow-sm hover:shadow-md"
-                                    />
-                                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
+                            ))}
 
                             <button 
                                 type="submit"
                                 disabled={carregando}
-                                className="w-full bg-gradient-to-r from-indigo-500 via-blue-500 to-indigo-600 text-white py-4 px-6 rounded-xl font-bold text-lg hover:from-indigo-600 hover:via-blue-600 hover:to-indigo-700 transform hover:scale-[1.02] hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-lg relative overflow-hidden"
+                                className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-indigo-700 active:scale-[0.98] transition-all duration-200 shadow-lg shadow-indigo-200 disabled:opacity-70 disabled:cursor-not-allowed mt-4"
                             >
-                                <span className="relative z-10 flex items-center justify-center gap-2">
-                                    {carregando ? (
-                                        <>
-                                            <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                            </svg>
-                                            Criando conta...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                                            </svg>
-                                            Criar Conta
-                                        </>
-                                    )}
-                                </span>
+                                {carregando ? (
+                                    <span className="flex items-center justify-center gap-2">
+                                        <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Processando...
+                                    </span>
+                                ) : "Criar Minha Conta"}
                             </button>
                         </form>
 
-                        <div className="mt-8 text-center">
-                            <div className="flex items-center justify-center mb-4">
-                                <div className="border-t border-gray-200 flex-1"></div>
-                                <span className="px-4 text-gray-500 text-sm font-medium">ou</span>
-                                <div className="border-t border-gray-200 flex-1"></div>
-                            </div>
-                            <p className="text-gray-600 text-sm font-medium">
-                                Já tem uma conta?{' '}
-                                <a href="/pages/login" className="text-indigo-600 hover:text-indigo-700 font-bold hover:underline transition-all">
-                                    Faça login
+                        <div className="mt-8 pt-6 border-t border-gray-100 text-center">
+                            <p className="text-gray-500 text-sm">
+                                Já possui cadastro?{' '}
+                                <a href="/pages/login" className="text-indigo-600 hover:text-indigo-800 font-bold transition-colors">
+                                    Acessar conta
                                 </a>
                             </p>
                         </div>
                     </div>
                 </div>
+                
+                {/* Footer simples */}
+                <p className="text-center text-gray-400 text-xs mt-8 tracking-wide">
+                    &copy; 2024 Sua Empresa. Todos os direitos reservados.
+                </p>
             </div>
         </div>
     )

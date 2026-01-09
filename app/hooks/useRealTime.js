@@ -31,17 +31,35 @@ export const useRealTime = (fetchFunction, interval = 30000, dependencies = []) 
 }
 
 export const useAuth = () => {
-  const checkAuth = () => {
-    // Simplificado - sem verificação de token
-    return true
+  const checkAuth = async () => {
+    try {
+      const response = await fetch(`${getApiUrl()}/auth/verify`, {
+        method: 'GET',
+        credentials: 'include'
+      })
+      return response.ok
+    } catch {
+      return false
+    }
   }
 
   const getHeaders = () => {
-    // Headers básicos sem autenticação
     return {
       'Content-Type': 'application/json'
     }
   }
 
-  return { checkAuth, getHeaders }
+  const logout = async () => {
+    try {
+      await fetch(`${getApiUrl()}/auth/logout`, {
+        method: 'POST',
+        credentials: 'include'
+      })
+    } catch (error) {
+      console.error('Erro no logout:', error)
+    }
+    window.location.href = '/pages/login'
+  }
+
+  return { checkAuth, getHeaders, logout }
 }

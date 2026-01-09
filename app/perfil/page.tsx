@@ -11,17 +11,23 @@ export default function Perfil() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      <div className="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-2xl">
+      {/* Desktop Sidebar */}
+      <div className="hidden sm:block fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-2xl">
+        <Sidebar currentPage="perfil" />
+      </div>
+      
+      {/* Mobile Header */}
+      <div className="sm:hidden fixed top-0 left-0 right-0 z-50">
         <Sidebar currentPage="perfil" />
       </div>
 
-      <div className="ml-64">
-        <div className="fixed top-0 left-64 right-0 z-40 bg-white/95 backdrop-blur-sm shadow-lg border-b border-gray-100">
-          <div className="px-4 sm:px-6 py-4">
-            <div className="flex items-center justify-between">
+      <div className="sm:ml-64">
+        <div className="fixed top-16 sm:top-0 left-0 sm:left-64 right-0 z-40 bg-white/95 backdrop-blur-sm shadow-lg border-b border-gray-100">
+          <div className="px-2 sm:px-4 lg:px-6 py-3 sm:py-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0">
               <div>
-                <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">Meu Perfil</h2>
-                <p className="text-sm text-gray-500">Configurações da conta e preferências</p>
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-bold bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">Meu Perfil</h2>
+                <p className="text-xs sm:text-sm text-gray-500">Configurações da conta e preferências</p>
               </div>
               
               <button
@@ -29,18 +35,18 @@ export default function Perfil() {
                   localStorage.removeItem('token')
                   window.location.href = '/pages/login'
                 }}
-                className="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-sm hover:shadow-md"
+                className="flex items-center justify-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-sm hover:shadow-md w-full sm:w-auto"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
-                <span className="hidden sm:inline">Sair</span>
+                <span className="text-xs sm:text-sm">Sair</span>
               </button>
             </div>
           </div>
         </div>
 
-        <div className="pt-20 p-4 sm:p-6">
+        <div className="pt-32 sm:pt-20 p-4 sm:p-6">
           <div className="max-w-4xl mx-auto space-y-6">
             <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
               <h3 className="text-lg font-bold text-gray-900 mb-4">Informações Pessoais</h3>
